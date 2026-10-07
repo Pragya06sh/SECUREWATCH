@@ -1,21 +1,11 @@
 [
-    {
-        "index": 0,
-        "timestamp": 1775038560.4741294,
-        "data": {
-            "message": "Genesis Block"
-        },
-        "previous_hash": "0",
-        "hash": "1b7237d77ef86592045d6df54a787b786811b1b1f113694495c1d7d41b462d72"
+  {
+    "index": 0,
+    "timestamp": 1791408774.7196753,
+    "data": {
+      "message": "Genesis Block \u2014 SecureWatch Audit Log"
     },
-    {
-        "index": 1,
-        "timestamp": 1775038560.4741294,
-        "data": {
-            "device_id": "AA:BB:CC",
-            "device_name": "Galaxy Watch"
-        },
-        "previous_hash": "1b7237d77ef86592045d6df54a787b786811b1b1f113694495c1d7d41b462d72",
-        "hash": "e83a0694c902ad1226ec85246e840336c07e646da5fc3131ab548da83c25825b"
-    }
+    "previous_hash": "0",
+    "hash": "3d29bda148212de6521a628341e07dff86e3a07008eefc0adb10ea5650f9b071"
+  }
 ]

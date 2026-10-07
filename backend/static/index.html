@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECUREWATCH — Smartwatch & BLE Intrusion Detection SOC</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="top-navbar">
+    <div class="logo-container">
+      <div class="logo-shield">🛡️</div>
+      <div class="logo-text">
+        <h1>SECUREWATCH</h1>
+        <span>AI-Driven BLE Intrusion Prevention & Cryptographic Audit</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="tab-navigation">
+      <button class="nav-tab-btn active" data-tab="threat-monitor">
+        <span>📡</span> Threat Monitor
+      </button>
+      <button class="nav-tab-btn" data-tab="blockchain-ledger">
+        <span>🔗</span> Audit Ledger
+      </button>
+      <button class="nav-tab-btn" data-tab="attack-injector">
+        <span>⚡</span> Attack Injector
+      </button>
+      <button class="nav-tab-btn" data-tab="ai-inspector">
+        <span>🧠</span> AI & ML Engine
+      </button>
+      <button class="nav-tab-btn" data-tab="event-log">
+        <span>📜</span> Audit Events
+      </button>
+    </nav>
+
+    <!-- Right Controls -->
+    <div class="nav-controls">
+      <div class="system-status-badge">
+        <div class="pulse-dot"></div>
+        <span id="systemStatusText">ACTIVE SOC MONITOR</span>
+      </div>
+      <button id="btnToggleSim" class="btn btn-outline btn-sm">
+        <span>▶</span> Start Sim Stream
+      </button>
+      <button id="btnLearnEnv" class="btn btn-outline btn-sm" style="border-color: #38bdf8; color: #38bdf8;" title="Scan 15s and mark visible nominal devices as KNOWN baseline environment">
+        <span>🧭</span> Learn Environment
+      </button>
+      <button id="btnClearData" class="btn btn-danger btn-sm" title="Clear all devices, events, and trusted list (keeps ledger intact)">
+        <span>🗑️</span> Clear All Data
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+
+    <!-- Global Stat Summary Cards -->
+    <section class="stat-cards-grid">
+      <div class="stat-card total">
+        <div class="stat-icon">📡</div>
+        <div class="stat-info">
+          <div class="stat-label">Total Devices</div>
+          <div class="stat-value" id="statTotal">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card safe">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <div class="stat-label">Verified Safe</div>
+          <div class="stat-value" id="statSafe">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card unverified">
+        <div class="stat-icon">🔍</div>
+        <div class="stat-info">
+          <div class="stat-label">Unverified</div>
+          <div class="stat-value" id="statUnverified">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card suspicious">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-info">
+          <div class="stat-label">Suspicious</div>
+          <div class="stat-value" id="statSuspicious">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card attack">
+        <div class="stat-icon">🚨</div>
+        <div class="stat-info">
+          <div class="stat-label">Attacks Detected</div>
+          <div class="stat-value" id="statAttacks">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card quarantine">
+        <div class="stat-icon">⛔</div>
+        <div class="stat-info">
+          <div class="stat-label">Quarantined</div>
+          <div class="stat-value" id="statQuarantined">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card blockchain">
+        <div class="stat-icon">🔗</div>
+        <div class="stat-info">
+          <div class="stat-label">Chained Blocks</div>
+          <div class="stat-value" id="statBlocks">0</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 1: Threat Monitor & Live Devices -->
+    <!-- ============================================== -->
+    <div id="tab-threat-monitor" class="tab-pane active">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>📡</span> Live Monitored Bluetooth Devices
+          </div>
+          <div class="panel-actions">
+            <input type="text" id="deviceSearchInput" placeholder="Search MAC, Name, Brand..." style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.4rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.8rem;">
+            <select id="deviceStatusFilter" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.4rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.8rem;">
+              <option value="">All Statuses</option>
+              <option value="TRUSTED">🛡️ Trusted Only</option>
+              <option value="SAFE">Safe Only</option>
+              <option value="UNVERIFIED">🔍 Unverified Only</option>
+              <option value="SUSPICIOUS">Suspicious Only</option>
+              <option value="ATTACK">Attacks Only</option>
+              <option value="BLOCKED">Blocked Only</option>
+            </select>
+            <button id="btnRefreshDevices" class="btn btn-outline btn-sm">🔄 Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Device Name</th>
+                <th>MAC Address</th>
+                <th>Manufacturer</th>
+                <th>RSSI</th>
+                <th>Risk Score</th>
+                <th>Reputation</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="devicesTableBody">
+              <tr>
+                <td colspan="8" style="text-align:center; padding: 2rem; color: var(--text-muted);">
+                  Waiting for device telemetry... (Start simulation or run BLE scanner)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 2: Cryptographic Audit Ledger -->
+    <!-- ============================================== -->
+    <div id="tab-blockchain-ledger" class="tab-pane" style="display: none;">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🔗</span> Tamper-Evident SHA-256 Hash Chain Audit Log
+          </div>
+          <div class="panel-actions">
+            <button id="btnVerifyLedger" class="btn btn-primary btn-sm">🛡️ Verify Cryptographic Integrity</button>
+            <button id="btnTamperTest" class="btn btn-danger btn-sm">⚠️ Demo Tamper Test</button>
+            <button id="btnTamperReset" class="btn btn-outline btn-sm">↺ Reset Tamper Demo</button>
+            <button id="btnResetLedger" class="btn btn-warning btn-sm" style="background: rgba(234, 179, 8, 0.15); border: 1px solid #eab308; color: #facc15;" title="Reset hash chain back to Genesis block">↺ Reset Ledger</button>
+          </div>
+        </div>
+
+        <div id="ledgerValidationStatus" style="margin-bottom: 1rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); display: none;"></div>
+
+        <div class="chain-container" id="ledgerBlocksContainer">
+          <!-- Dynamically populated blocks -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 3: Attack Injector & Simulation Suite -->
+    <!-- ============================================== -->
+    <div id="tab-attack-injector" class="tab-pane" style="display: none;">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>⚡</span> One-Click Attack Scenarios for Live Evaluation
+          </div>
+          <div class="panel-actions">
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">Click any scenario to immediately inject into detection pipeline</span>
+          </div>
+        </div>
+
+        <div class="scenario-grid">
+          <div class="scenario-card">
+            <h4>🎭 Spoofed Smartwatch</h4>
+            <p>A malicious device assumes an authorized MAC address but silently changes advertised payload/name.</p>
+            <button class="btn btn-danger btn-sm" onclick="injectScenario('spoofed_watch')">Inject Spoof Attack</button>
+          </div>
+
+          <div class="scenario-card">
+            <h4>🌊 Request Flood (DoS)</h4>
+            <p>Bursts 15 rapid BLE connection/interrogation requests in under 2 seconds to exhaust peripheral bandwidth.</p>
+            <button class="btn btn-danger btn-sm" onclick="injectScenario('request_flood')">Inject Request Flood</button>
+          </div>
+
+          <div class="scenario-card">
+            <h4>🚀 RSSI Teleportation</h4>
+            <p>Signal jumps by 55+ dBm in milliseconds — physically impossible without antenna spoofing or amplifier switching.</p>
+            <button class="btn btn-danger btn-sm" onclick="injectScenario('rssi_teleport')">Inject RSSI Jump</button>
+          </div>
+
+          <div class="scenario-card">
+            <h4>☠️ Malicious Broadcast Name</h4>
+            <p>Device broadcasting known exploit/hacking signatures in its BLE advertising payload.</p>
+            <button class="btn btn-danger btn-sm" onclick="injectScenario('malicious_name')">Inject Malicious Name</button>
+          </div>
+
+          <div class="scenario-card">
+            <h4>🕵️ Rogue High-Power Lurker</h4>
+            <p>Unknown OUI manufacturer broadcasting at suspicious near-zero dBm proximity.</p>
+            <button class="btn btn-danger btn-sm" onclick="injectScenario('unknown_lurker')">Inject Rogue Lurker</button>
+          </div>
+
+          <div class="scenario-card">
+            <h4>🌪️ Mixed Cyber Attack Wave</h4>
+            <p>Simultaneous multi-vector assault combining spoofing, name tampering, and legitimate user traffic.</p>
+            <button class="btn btn-danger btn-sm" onclick="injectScenario('mixed_wave')">Inject Mixed Wave</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 4: AI & ML Engine Inspector -->
+    <!-- ============================================== -->
+    <div id="tab-ai-inspector" class="tab-pane" style="display: none;">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🧠</span> Machine Learning & Behavioral Intelligence Telemetry
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;" id="modelsSummaryCards">
+          <!-- Populated dynamically -->
+        </div>
+
+        <div class="panel-title" style="margin-top: 1rem;">
+          <span>📊</span> Model Validation & Feature Analysis
+        </div>
+
+        <div class="model-charts-grid">
+          <div class="model-img-card">
+            <h4>Confusion Matrix</h4>
+            <img src="/static/confusion_matrix.png" alt="Confusion Matrix" onerror="this.src='/backend/confusion_matrix.png'">
+          </div>
+          <div class="model-img-card">
+            <h4>Feature Importance</h4>
+            <img src="/static/feature_importance.png" alt="Feature Importance" onerror="this.src='/backend/feature_importance.png'">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 5: Security Event Log -->
+    <!-- ============================================== -->
+    <div id="tab-event-log" class="tab-pane" style="display: none;">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>📜</span> Real-Time Security Incident Feed
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Device</th>
+                <th>MAC</th>
+                <th>Status</th>
+                <th>Risk</th>
+                <th>Explainable Reasons</th>
+              </tr>
+            </thead>
+            <tbody id="eventsTableBody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Device Detail Modal -->
+  <div class="modal-overlay" id="deviceModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalDeviceName">Device Inspection</h3>
+        <button class="close-modal" id="btnCloseModal">&times;</button>
+      </div>
+      <div id="modalBody">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
