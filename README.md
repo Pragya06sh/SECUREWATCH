@@ -38,7 +38,7 @@ This starts the FastAPI backend on `http://127.0.0.1:8000` and automatically ope
 In a separate terminal, to discover real Bluetooth devices around you:
 ```bash
 cd backend
-python scanner.py
+
 ```
 
 ### 3. Simulation Mode (No Bluetooth Hardware Needed)

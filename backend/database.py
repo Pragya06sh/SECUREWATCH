@@ -89,15 +89,20 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_activity_device ON activity_log(device_id);
         """)
         
-        # Migrations: ensure 'trusted' and 'reasons' columns exist
-        try:
-            conn.execute("ALTER TABLE devices ADD COLUMN trusted INTEGER DEFAULT 0")
-        except Exception:
-            pass
-        try:
-            conn.execute("ALTER TABLE devices ADD COLUMN reasons TEXT")
-        except Exception:
-            pass
+        # Migrations: ensure columns exist for older databases
+        _migration_columns = [
+            ("trusted", "INTEGER DEFAULT 0"),
+            ("reasons", "TEXT"),
+            ("brand", "TEXT"),
+            ("device_type_str", "TEXT"),
+            ("mac_type", "TEXT"),
+            ("how_identified", "TEXT"),
+        ]
+        for col_name, col_type in _migration_columns:
+            try:
+                conn.execute(f"ALTER TABLE devices ADD COLUMN {col_name} {col_type}")
+            except Exception:
+                pass
 
 
 # ----------------------------------
@@ -106,7 +111,8 @@ def init_db():
 
 def upsert_device(device_id, device_name, manufacturer, device_type,
                   risk_score, status, rssi, reputation, fingerprint,
-                  quarantined, blocked, name_changes=0, trusted=0, reasons=None):
+                  quarantined, blocked, name_changes=0, trusted=0, reasons=None,
+                  brand=None, device_type_str=None, mac_type=None, how_identified=None):
     now = time.time()
     reasons_json = json.dumps(reasons or []) if reasons is not None else None
     with get_db() as conn:
@@ -121,8 +127,9 @@ def upsert_device(device_id, device_name, manufacturer, device_type,
             INSERT INTO devices
                 (device_id, device_name, manufacturer, device_type,
                  risk_score, status, rssi, reputation, fingerprint,
-                 first_seen, last_seen, request_count, quarantined, blocked, name_changes, trusted, reasons)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
+                 first_seen, last_seen, request_count, quarantined, blocked,
+                 name_changes, trusted, reasons, brand, device_type_str, mac_type, how_identified)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(device_id) DO UPDATE SET
                 device_name   = excluded.device_name,
                 manufacturer  = excluded.manufacturer,
@@ -138,10 +145,15 @@ def upsert_device(device_id, device_name, manufacturer, device_type,
                 blocked       = excluded.blocked,
                 name_changes  = excluded.name_changes,
                 trusted       = CASE WHEN excluded.trusted != 0 THEN excluded.trusted ELSE devices.trusted END,
-                reasons       = excluded.reasons
+                reasons       = excluded.reasons,
+                brand         = COALESCE(excluded.brand, devices.brand),
+                device_type_str = COALESCE(excluded.device_type_str, devices.device_type_str),
+                mac_type      = COALESCE(excluded.mac_type, devices.mac_type),
+                how_identified = COALESCE(excluded.how_identified, devices.how_identified)
         """, (device_id, device_name, manufacturer, device_type,
               risk_score, status, rssi, reputation, fingerprint,
-              first_seen, now, quarantined, blocked, name_changes, is_trusted, reasons_json))
+              first_seen, now, quarantined, blocked, name_changes, is_trusted, reasons_json,
+              brand, device_type_str, mac_type, how_identified))
 
 
 def get_all_devices(limit=500):

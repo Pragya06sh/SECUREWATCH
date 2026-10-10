@@ -27,6 +27,7 @@ const deviceStatusFilter = document.getElementById("deviceStatusFilter");
 const toastContainer = document.getElementById("toastContainer");
 const deviceModal = document.getElementById("deviceModal");
 const btnCloseModal = document.getElementById("btnCloseModal");
+const deviceCountBadge = document.getElementById("deviceCountBadge");
 
 // --- Initialization ---
 document.addEventListener("DOMContentLoaded", () => {
@@ -201,7 +202,13 @@ async function fetchDevices() {
     if (!res.ok) return;
     const data = await res.json();
 
-    renderDevicesTable(data.devices || []);
+    // Update device count badge
+    const deviceList = data.devices || [];
+    if (deviceCountBadge) {
+      deviceCountBadge.textContent = `${data.count || deviceList.length} device${deviceList.length !== 1 ? 's' : ''} tracked`;
+    }
+
+    renderDevicesTable(deviceList);
   } catch (err) {
     console.error("Failed to fetch devices:", err);
   }
@@ -211,7 +218,7 @@ function renderDevicesTable(devices) {
   if (!devices || devices.length === 0) {
     devicesTableBody.innerHTML = `
       <tr>
-        <td colspan="8" style="text-align:center; padding: 2rem; color: var(--text-muted);">
+        <td colspan="9" style="text-align:center; padding: 2rem; color: var(--text-muted);">
           No devices match current filter.
         </td>
       </tr>
@@ -227,6 +234,26 @@ function renderDevicesTable(devices) {
     const repColor = rep > 70 ? "var(--status-safe)" : rep > 40 ? "var(--status-suspicious)" : "var(--status-attack)";
     const statusTooltip = dev.status === "UNVERIFIED" ? 'title="Identity hidden or unrecognised. No malicious behaviour observed."' : '';
 
+    // Brand display
+    const brand = dev.brand || null;
+    const howIdentified = dev.how_identified || '';
+    const brandDisplay = brand
+      ? `<span style="font-weight: 600; color: #e2e8f0;" title="${escapeHtml(howIdentified)}">${escapeHtml(brand)}</span>`
+      : `<span style="color: var(--text-muted); font-size: 0.78rem; cursor: help;" title="Device hides its name and vendor for privacy">Unidentified</span>`;
+
+    // Device type display with icon
+    const deviceTypeStr = dev.device_type_str || null;
+    const deviceTypeIcon = dev.device_type_icon || '📶';
+    const typeDisplay = deviceTypeStr
+      ? `<span title="${escapeHtml(deviceTypeStr)}">${deviceTypeIcon} ${escapeHtml(deviceTypeStr)}</span>`
+      : `<span style="color: var(--text-muted);">—</span>`;
+
+    // MAC type badge
+    const macType = dev.mac_type || 'unknown';
+    const macTypeLabel = dev.mac_type_label || 'Unknown';
+    const macTypeColor = dev.mac_type_color || '#6b7280';
+    const macTypeBadge = `<span class="mac-type-badge" style="background: ${macTypeColor}20; color: ${macTypeColor}; border: 1px solid ${macTypeColor}40; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.62rem; font-weight: 600; white-space: nowrap; margin-left: 0.3rem;" title="MAC type: ${macTypeLabel}. ${macType === 'public' ? 'OUI prefix usable for vendor lookup.' : 'Randomized — OUI prefix is not reliable for identification.'}">${macTypeLabel}</span>`;
+
     return `
       <tr>
         <td>
@@ -241,8 +268,12 @@ function renderDevicesTable(devices) {
             ${escapeHtml(dev.device_name || "Unknown")}
           </strong>
         </td>
-        <td><span class="mac-code">${escapeHtml(dev.device_id)}</span></td>
-        <td>${escapeHtml(dev.manufacturer || "Unknown")}</td>
+        <td>${brandDisplay}</td>
+        <td style="font-size: 0.82rem;">${typeDisplay}</td>
+        <td>
+          <span class="mac-code">${escapeHtml(dev.device_id)}</span>
+          ${macTypeBadge}
+        </td>
         <td><span style="font-family: var(--font-mono);">${dev.rssi || "-"} dBm</span></td>
         <td>
           <span style="font-weight: 700; color: ${dev.risk_score > 40 ? 'var(--status-attack)' : dev.risk_score > 15 ? 'var(--status-suspicious)' : 'var(--status-safe)'}">
@@ -286,16 +317,37 @@ async function inspectDevice(deviceId) {
     const isTrusted = Boolean(dev.trusted);
 
     document.getElementById("modalDeviceName").textContent = `Inspection: ${dev.device_name || "Unknown"} (${dev.device_id})`;
+
+    // Build identification section
+    const brand = dev.brand || 'Unidentified';
+    const howId = dev.how_identified || 'No identification evidence available';
+    const deviceTypeStr = dev.device_type_str || 'Unknown';
+    const deviceTypeIcon = dev.device_type_icon || '📶';
+    const macTypeStr = dev.mac_type_label || dev.mac_type || 'Unknown';
+    const macTypeColor = dev.mac_type_color || '#6b7280';
+    const macType = dev.mac_type || 'unknown';
+    const macTypeNote = macType === 'public'
+      ? 'OUI prefix is usable for vendor lookup.'
+      : 'MAC is randomized — OUI prefix is not reliable for identification.';
     
     document.getElementById("modalBody").innerHTML = `
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
         <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-sm);">
           <div style="font-size: 0.75rem; color: var(--text-secondary);">MAC ADDRESS</div>
           <div class="mac-code" style="font-size: 0.95rem; margin-top: 0.25rem;">${dev.device_id}</div>
+          <div style="margin-top: 0.3rem;">
+            <span style="background: ${macTypeColor}20; color: ${macTypeColor}; border: 1px solid ${macTypeColor}40; padding: 0.15rem 0.45rem; border-radius: 4px; font-size: 0.68rem; font-weight: 600;">${escapeHtml(macTypeStr)}</span>
+            <span style="font-size: 0.65rem; color: var(--text-muted); margin-left: 0.4rem;">${escapeHtml(macTypeNote)}</span>
+          </div>
         </div>
         <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-sm);">
-          <div style="font-size: 0.75rem; color: var(--text-secondary);">MANUFACTURER</div>
-          <div style="font-weight: 700; margin-top: 0.25rem;">${dev.manufacturer}</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary);">BRAND / MANUFACTURER</div>
+          <div style="font-weight: 700; margin-top: 0.25rem; font-size: 1.05rem;">${escapeHtml(brand)}</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">${escapeHtml(dev.manufacturer || 'Unknown OUI')}</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-sm);">
+          <div style="font-size: 0.75rem; color: var(--text-secondary);">DEVICE TYPE</div>
+          <div style="font-weight: 700; margin-top: 0.25rem;">${deviceTypeIcon} ${escapeHtml(deviceTypeStr)}</div>
         </div>
         <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-sm);">
           <div style="font-size: 0.75rem; color: var(--text-secondary);">SECURITY STATUS</div>
@@ -304,6 +356,14 @@ async function inspectDevice(deviceId) {
             ${isTrusted ? '<span class="badge badge-trusted">🛡️ TRUSTED</span>' : ''}
           </div>
         </div>
+      </div>
+
+      <div style="background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.2); border-radius: var(--radius-sm); padding: 0.65rem 0.9rem; margin-bottom: 1.5rem;">
+        <div style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase; margin-bottom: 0.2rem;">How Identified</div>
+        <div style="font-size: 0.85rem; color: #e2e8f0;">${escapeHtml(howId)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
         <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-sm);">
           <div style="font-size: 0.75rem; color: var(--text-secondary);">RISK SCORE / REPUTATION</div>
           <div style="font-weight: 700; margin-top: 0.25rem;">

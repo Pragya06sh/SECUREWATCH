@@ -7,5 +7,165 @@
     },
     "previous_hash": "0",
     "hash": "3d29bda148212de6521a628341e07dff86e3a07008eefc0adb10ea5650f9b071"
+  },
+  {
+    "index": 1,
+    "timestamp": 1791454372.4706347,
+    "data": {
+      "device_id": "6F:8F:18:8B:23:3F",
+      "device_name": "Unknown_Device",
+      "manufacturer": "Unknown",
+      "event": "ATTACK_DETECTED_AND_QUARANTINED",
+      "risk_score": 50.0,
+      "reasons": [
+        {
+          "reason": "+35 RSSI signal jump (40 dBm >= 40 dBm)",
+          "contribution": 35
+        },
+        {
+          "reason": "+15 Isolation Forest anomaly (corroborated)",
+          "contribution": 15
+        }
+      ],
+      "rssi": 14,
+      "request_count": 2,
+      "timestamp": 1791454370
+    },
+    "previous_hash": "3d29bda148212de6521a628341e07dff86e3a07008eefc0adb10ea5650f9b071",
+    "hash": "754f069ee149fc234f3ce1ba401d07109b4621d7a29921f959a14c0f56028962"
+  },
+  {
+    "index": 2,
+    "timestamp": 1791454707.0577283,
+    "data": {
+      "device_id": "D6:2C:1B:D5:76:69",
+      "device_name": "Caliber buzz_7669",
+      "manufacturer": "Unknown",
+      "event": "ATTACK_DETECTED_AND_QUARANTINED",
+      "risk_score": 50.0,
+      "reasons": [
+        {
+          "reason": "+35 RSSI signal jump (40 dBm >= 40 dBm)",
+          "contribution": 35
+        },
+        {
+          "reason": "+15 Isolation Forest anomaly (corroborated)",
+          "contribution": 15
+        }
+      ],
+      "rssi": -30,
+      "request_count": 2,
+      "timestamp": 1791454705
+    },
+    "previous_hash": "754f069ee149fc234f3ce1ba401d07109b4621d7a29921f959a14c0f56028962",
+    "hash": "1d0d224aa632c32012eb2c9a96286d77c2ff0acd702ad5edf87327455b7ea633"
+  },
+  {
+    "index": 3,
+    "timestamp": 1791455181.7185514,
+    "data": {
+      "device_id": "6F:8F:18:8B:23:3F",
+      "device_name": "Unknown_Device",
+      "manufacturer": "Unknown",
+      "event": "ATTACK_DETECTED_AND_QUARANTINED",
+      "risk_score": 50.0,
+      "reasons": [
+        {
+          "reason": "Active quarantine enforcement is active for this device",
+          "contribution": 0
+        },
+        {
+          "reason": "+35 RSSI signal jump (52 dBm >= 40 dBm)",
+          "contribution": 35
+        },
+        {
+          "reason": "+15 Isolation Forest anomaly (corroborated)",
+          "contribution": 15
+        }
+      ],
+      "rssi": -16,
+      "request_count": 1,
+      "timestamp": 1791455180
+    },
+    "previous_hash": "1d0d224aa632c32012eb2c9a96286d77c2ff0acd702ad5edf87327455b7ea633",
+    "hash": "b3504c640d1ed9f7b3b113603e749a29a070a3ff04ead03f4225a6affc809acb"
+  },
+  {
+    "index": 4,
+    "timestamp": 1791455510.7466779,
+    "data": {
+      "device_id": "54:25:51:91:2D:36",
+      "device_name": "Unknown_Device",
+      "manufacturer": "Unknown",
+      "event": "ATTACK_DETECTED_AND_QUARANTINED",
+      "risk_score": 50.0,
+      "reasons": [
+        {
+          "reason": "+35 RSSI signal jump (54 dBm >= 40 dBm)",
+          "contribution": 35
+        },
+        {
+          "reason": "+15 Isolation Forest anomaly (corroborated)",
+          "contribution": 15
+        }
+      ],
+      "rssi": -18,
+      "request_count": 2,
+      "timestamp": 1791455510
+    },
+    "previous_hash": "b3504c640d1ed9f7b3b113603e749a29a070a3ff04ead03f4225a6affc809acb",
+    "hash": "c14fedad7bd137fd04499c35e7a66ffa971b719efcef1cb84faa0cc5017261fb"
+  },
+  {
+    "index": 5,
+    "timestamp": 1791458151.7602427,
+    "data": {
+      "device_id": "1F:22:F0:C7:5A:59",
+      "device_name": "Unknown_Device",
+      "manufacturer": "Unknown",
+      "event": "ATTACK_DETECTED_AND_QUARANTINED",
+      "risk_score": 50.0,
+      "reasons": [
+        {
+          "reason": "+35 RSSI signal jump (54 dBm >= 40 dBm)",
+          "contribution": 35
+        },
+        {
+          "reason": "+15 Isolation Forest anomaly (corroborated)",
+          "contribution": 15
+        }
+      ],
+      "rssi": -30,
+      "request_count": 1,
+      "timestamp": 1791458144
+    },
+    "previous_hash": "c14fedad7bd137fd04499c35e7a66ffa971b719efcef1cb84faa0cc5017261fb",
+    "hash": "28f05907eff6a9a19328f973bd11f1e7c2f82b0691134caba4b17d386803ecc0"
+  },
+  {
+    "index": 6,
+    "timestamp": 1791468885.4971564,
+    "data": {
+      "device_id": "F4:14:BF:66:1E:61",
+      "device_name": "AD_401_RAC_056905_WW_1e60",
+      "manufacturer": "Unknown",
+      "event": "ATTACK_DETECTED_AND_QUARANTINED",
+      "risk_score": 50.0,
+      "reasons": [
+        {
+          "reason": "+30 name changed for same MAC",
+          "contribution": 30
+        },
+        {
+          "reason": "+20 name changed 2 times",
+          "contribution": 20
+        }
+      ],
+      "rssi": -70,
+      "request_count": 1,
+      "timestamp": 1791468877
+    },
+    "previous_hash": "28f05907eff6a9a19328f973bd11f1e7c2f82b0691134caba4b17d386803ecc0",
+    "hash": "41359fd05fa48e5ad46b03106b07fd528de6eb54386009c6f934fcff4ab1794b"
   }
 ]

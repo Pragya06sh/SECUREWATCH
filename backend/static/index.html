@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SECUREWATCH — Smartwatch & BLE Intrusion Detection SOC</title>
+  <title>BLUEWARD — Smartwatch & BLE Intrusion Detection SOC</title>
   <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
     <div class="logo-container">
       <div class="logo-shield">🛡️</div>
       <div class="logo-text">
-        <h1>SECUREWATCH</h1>
+        <h1>BLUEWARD</h1>
         <span>AI-Driven BLE Intrusion Prevention & Cryptographic Audit</span>
       </div>
     </div>
@@ -125,9 +125,10 @@
         <div class="panel-header">
           <div class="panel-title">
             <span>📡</span> Live Monitored Bluetooth Devices
+            <span id="deviceCountBadge" class="device-count-badge" style="margin-left: 0.75rem; font-size: 0.75rem; background: rgba(56,189,248,0.15); color: #38bdf8; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 600;"></span>
           </div>
           <div class="panel-actions">
-            <input type="text" id="deviceSearchInput" placeholder="Search MAC, Name, Brand..." style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.4rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.8rem;">
+            <input type="text" id="deviceSearchInput" placeholder="Search MAC, Name, Brand, Type..." style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.4rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.8rem;">
             <select id="deviceStatusFilter" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.4rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.8rem;">
               <option value="">All Statuses</option>
               <option value="TRUSTED">🛡️ Trusted Only</option>
@@ -141,14 +142,19 @@
           </div>
         </div>
 
+        <div style="padding: 0.4rem 1rem; font-size: 0.72rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.5rem;">
+          <span>ℹ️</span> Only devices that are actively broadcasting can be detected. Connected or paired devices stay silent.
+        </div>
+
         <div class="table-responsive">
           <table class="data-table">
             <thead>
               <tr>
                 <th>Status</th>
                 <th>Device Name</th>
+                <th>Brand</th>
+                <th>Type</th>
                 <th>MAC Address</th>
-                <th>Manufacturer</th>
                 <th>RSSI</th>
                 <th>Risk Score</th>
                 <th>Reputation</th>
@@ -157,7 +163,7 @@
             </thead>
             <tbody id="devicesTableBody">
               <tr>
-                <td colspan="8" style="text-align:center; padding: 2rem; color: var(--text-muted);">
+                <td colspan="9" style="text-align:center; padding: 2rem; color: var(--text-muted);">
                   Waiting for device telemetry... (Start simulation or run BLE scanner)
                 </td>
               </tr>

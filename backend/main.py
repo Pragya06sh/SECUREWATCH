@@ -34,6 +34,7 @@ import database as db
 from blockchain import Blockchain
 from ai_detector import load_models, get_model_info
 from detection_engine import detect_and_score, get_manufacturer, generate_fingerprint
+from device_identifier import identify_device, classify_mac_type, mac_type_label, DEVICE_TYPE_ICONS
 from alerts import send_alert
 import simulation as sim
 from trusted_manager import (
@@ -248,6 +249,17 @@ def process_device_verification(
         is_trusted=is_trusted,
     )
 
+    # 4b. Run advanced device identification
+    identification = identify_device(
+        mac=device_id,
+        local_name=effective_name if is_real_name(effective_name) else None,
+        oui_manufacturer=detection["manufacturer"],
+    )
+    id_brand = identification["brand"]
+    id_device_type_str = identification["device_type"]
+    id_mac_type = identification["mac_type"]
+    id_how = identification["how_identified"]
+
     risk_score = detection["risk_score"]
     security_status = detection["status"]
     reasons = list(detection["reasons"])
@@ -309,6 +321,10 @@ def process_device_verification(
         name_changes=name_changes,
         trusted=1 if is_trusted else 0,
         reasons=reasons,
+        brand=id_brand,
+        device_type_str=id_device_type_str,
+        mac_type=id_mac_type,
+        how_identified=id_how,
     )
 
     db.add_event(
@@ -340,6 +356,13 @@ def process_device_verification(
         "blocked": blocked,
         "reasons": reasons,
         "timestamp": timestamp,
+        "brand": id_brand,
+        "device_type_str": id_device_type_str,
+        "device_type_icon": identification.get("device_type_icon", "📶"),
+        "mac_type": id_mac_type,
+        "mac_type_label": identification.get("mac_type_label", "Unknown"),
+        "mac_type_color": identification.get("mac_type_color", "#6b7280"),
+        "how_identified": id_how,
     }
 
 
@@ -469,7 +492,11 @@ def get_devices(
         s = search.lower()
         devices = [
             d for d in devices
-            if s in d.get("device_id", "").lower() or s in (d.get("device_name") or "").lower() or s in (d.get("manufacturer") or "").lower()
+            if s in d.get("device_id", "").lower()
+            or s in (d.get("device_name") or "").lower()
+            or s in (d.get("manufacturer") or "").lower()
+            or s in (d.get("brand") or "").lower()
+            or s in (d.get("device_type_str") or "").lower()
         ]
     return {"count": len(devices), "devices": devices}
 
