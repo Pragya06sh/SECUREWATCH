@@ -1,0 +1,66 @@
+{
+  "dataset": {
+    "source": "Synthetic Bluetooth device feature dataset",
+    "type": "synthetic",
+    "note": "Evaluation on synthetic benchmark dataset; real-world accuracy depends on deployment environment and physical RF conditions. Synthetic accuracy is not presented as real-world accuracy.",
+    "total_samples": 8000,
+    "train_samples": 4800,
+    "val_samples": 1600,
+    "test_samples": 1600,
+    "attack_ratio": 0.0195,
+    "features": [
+      "rssi",
+      "request_count",
+      "device_type",
+      "manufacturer_known"
+    ]
+  },
+  "random_forest": {
+    "validation": {
+      "accuracy": 0.9806,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "roc_auc": 0.4508
+    },
+    "test": {
+      "accuracy": 0.9806,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "roc_auc": 0.5544
+    },
+    "confusion_matrix": [
+      [
+        1569,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    "feature_importance": {
+      "rssi": 0.5797,
+      "request_count": 0.2234,
+      "device_type": 0.1388,
+      "manufacturer_known": 0.0582
+    },
+    "hyperparameters": {
+      "n_estimators": 200,
+      "max_depth": 15,
+      "min_samples_split": 5,
+      "min_samples_leaf": 2
+    }
+  },
+  "isolation_forest": {
+    "type": "unsupervised anomaly detection",
+    "contamination": 0.15,
+    "n_estimators": 200,
+    "note": "No labeled accuracy \u2014 anomaly detection is used as an additional signal"
+  },
+  "images": {
+    "confusion_matrix": "/static/img/confusion_matrix.png",
+    "feature_importance": "/static/img/feature_importance.png"
+  }
+}
